@@ -52,7 +52,7 @@
 
   <div class="chart-wrapper">
     <canvas id="gaugeChart" role="img" aria-label="Semicircle donut chart: Product Name Search vs Barcode Search"></canvas>
-    <div class="center-label" id="totalLabel">138</div>
+    <div class="center-label" id="totalLabel">...</div>
   </div>
 
   <div class="legend">
@@ -68,9 +68,13 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script>
-    // ✅ UPDATE THESE VALUES to match your QuickSight data
-    const productVal = 60;
-    const barcodeVal = 78;
+    // ✅ Read values from URL parameters passed by QuickSight
+    // QuickSight URL will look like:
+    // https://yourpage.github.io/?product=60&barcode=78
+    const params = new URLSearchParams(window.location.search);
+
+    const productVal = parseFloat(params.get('product')) || 0;
+    const barcodeVal = parseFloat(params.get('barcode')) || 0;
     const total = productVal + barcodeVal;
 
     document.getElementById('totalLabel').textContent = total;
