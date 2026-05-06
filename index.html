@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Chart</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+    .chart-wrapper {
+      position: relative;
+      width: 320px;
+      height: 180px;
+    }
+    .center-label {
+      position: absolute;
+      bottom: 8px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+    .legend {
+      display: flex;
+      gap: 24px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #444;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chart-wrapper">
+    <canvas id="gaugeChart" role="img" aria-label="Semicircle donut chart: Product Name Search vs Barcode Search"></canvas>
+    <div class="center-label" id="totalLabel">138</div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="dot" style="background:#9b8de8;"></div>
+      <span>Product Name Search</span>
+    </div>
+    <div class="legend-item">
+      <div class="dot" style="background:#f5a623;"></div>
+      <span>Barcode Search</span>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+    // ✅ UPDATE THESE VALUES to match your QuickSight data
+    const productVal = 60;
+    const barcodeVal = 78;
+    const total = productVal + barcodeVal;
+
+    document.getElementById('totalLabel').textContent = total;
+
+    const canvas = document.getElementById('gaugeChart');
+    canvas.width = 320;
+    canvas.height = 175;
+
+    new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [productVal, barcodeVal],
+          backgroundColor: ['#9b8de8', '#f5a623'],
+          borderWidth: 0,
+          hoverOffset: 0
+        }]
+      },
+      options: {
+        responsive: false,
+        rotation: -90,
+        circumference: 180,
+        cutout: '68%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const labels = ['Product Name Search', 'Barcode Search'];
+                return ` ${labels[ctx.dataIndex]}: ${ctx.parsed}`;
+              }
+            }
+          }
+        },
+        animation: { animateRotate: true, duration: 900 }
+      }
+    });
+  </script>
+</body>
+</html>
