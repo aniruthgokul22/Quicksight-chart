@@ -71,10 +71,9 @@
     // ✅ Read values from URL parameters passed by QuickSight
     // QuickSight URL will look like:
     // https://yourpage.github.io/?product=60&barcode=78
-    const params = new URLSearchParams(window.location.search);
-
-    const productVal = parseFloat(params.get('product')) || 0;
-    const barcodeVal = parseFloat(params.get('barcode')) || 0;
+  const params = new URLSearchParams(window.location.search);
+  const product = Number(params.get('product')) || 0;
+  const barcode = Number(params.get('barcode')) || 0;
     const total = productVal + barcodeVal;
 
     document.getElementById('totalLabel').textContent = total;
