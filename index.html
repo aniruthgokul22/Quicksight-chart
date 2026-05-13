@@ -73,8 +73,8 @@
   // Read values from QuickSight URL params
   const params = new URLSearchParams(window.location.search);
 
-  const productVal = Number(params.get('product')) || 0;
-  const barcodeVal = Number(params.get('barcode')) || 0;
+  const productVal = Number(params.get('ProductNameCount')) || 0;
+  const barcodeVal = Number(params.get('BarcodeCount')) || 0;
 
   const total = productVal + barcodeVal;
 
