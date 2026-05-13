@@ -67,50 +67,66 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  <script>
-    // ✅ Read values from URL parameters passed by QuickSight
-    // QuickSight URL will look like:
-    // https://yourpage.github.io/?product=60&barcode=78
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<script>
+  // Read values from QuickSight URL params
   const params = new URLSearchParams(window.location.search);
-  const product = Number(params.get('product')) || 0;
-  const barcode = Number(params.get('barcode')) || 0;
-    const total = productVal + barcodeVal;
 
-    document.getElementById('totalLabel').textContent = total;
+  const productVal = Number(params.get('product')) || 0;
+  const barcodeVal = Number(params.get('barcode')) || 0;
 
-    const canvas = document.getElementById('gaugeChart');
-    canvas.width = 320;
-    canvas.height = 175;
+  const total = productVal + barcodeVal;
 
-    new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [productVal, barcodeVal],
-          backgroundColor: ['#9b8de8', '#f5a623'],
-          borderWidth: 0,
-          hoverOffset: 0
-        }]
-      },
-      options: {
-        responsive: false,
-        rotation: -90,
-        circumference: 180,
-        cutout: '68%',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => {
-                const labels = ['Product Name Search', 'Barcode Search'];
-                return ` ${labels[ctx.dataIndex]}: ${ctx.parsed}`;
-              }
+  // Center total
+  document.getElementById('totalLabel').textContent = total;
+
+  const canvas = document.getElementById('gaugeChart');
+
+  new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [productVal, barcodeVal],
+        backgroundColor: ['#9b8de8', '#f5a623'],
+        borderWidth: 0,
+        hoverOffset: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      rotation: -90,
+      circumference: 180,
+
+      cutout: '68%',
+
+      plugins: {
+        legend: {
+          display: false
+        },
+
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const labels = [
+                'Product Name Search',
+                'Barcode Search'
+              ];
+
+              return `${labels[ctx.dataIndex]}: ${ctx.parsed}`;
             }
           }
-        },
-        animation: { animateRotate: true, duration: 900 }
+        }
+      },
+
+      animation: {
+        animateRotate: true,
+        duration: 900
       }
-    });
-  </script>
+    }
+  });
+</script>
 </body>
 </html>
