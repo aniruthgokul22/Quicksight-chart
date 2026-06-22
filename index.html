@@ -80,6 +80,9 @@
     const barcodeVal  = Number(params.get('BarcodeCount'))     || 0;
     const total       = productVal + barcodeVal;
 
+    console.log(params.get("ProductNameCount"));
+    console.log(params.get("BarcodeCount"));
+    
     /* ── Center total label ──────────────────────────────────────────────── */
     document.getElementById('totalLabel').textContent =
       total > 0 ? total.toLocaleString() : '0';
