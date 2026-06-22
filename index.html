@@ -17,47 +17,53 @@
     }
     .chart-wrapper {
       position: relative;
-      width: 320px;
-      height: 180px;
+      width: 340px;
+      height: 190px;
     }
     .center-label {
       position: absolute;
-      bottom: 8px;
-      left: 0; right: 0;
+      bottom: 18px;
+      left: 0;
+      right: 0;
       text-align: center;
-      font-size: 32px;
+      font-size: 34px;
       font-weight: 700;
       color: #1a1a1a;
+      letter-spacing: -0.5px;
     }
     .legend {
       display: flex;
-      gap: 24px;
-      margin-top: 12px;
+      gap: 32px;
+      margin-top: 18px;
       font-size: 13px;
-      color: #444;
+      color: #555555;
     }
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
+      flex-shrink: 0;
     }
   </style>
 </head>
 <body>
 
   <div class="chart-wrapper">
-    <canvas id="gaugeChart" role="img" aria-label="Semicircle donut chart: Product Name Search vs Barcode Search"></canvas>
-    <div class="center-label" id="totalLabel">...</div>
+    <canvas id="gaugeChart"
+      role="img"
+      aria-label="Semicircle donut chart: Product Name Search vs Barcode Search">
+    </canvas>
+    <div class="center-label" id="totalLabel">—</div>
   </div>
 
   <div class="legend">
     <div class="legend-item">
-      <div class="dot" style="background:#9b8de8;"></div>
+      <div class="dot" style="background:#a89be0;"></div>
       <span>Product Name Search</span>
     </div>
     <div class="legend-item">
@@ -67,65 +73,61 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  
-<script>
-  // Read values from QuickSight URL params
-  const params = new URLSearchParams(window.location.search);
+  <script>
+    /* ── Read values from QuickSight URL params ──────────────────────────── */
+    const params      = new URLSearchParams(window.location.search);
+    const productVal  = Number(params.get('ProductNameCount')) || 0;
+    const barcodeVal  = Number(params.get('BarcodeCount'))     || 0;
+    const total       = productVal + barcodeVal;
 
-  const productVal = Number(params.get('ProductNameCount')) || 0;
-  const barcodeVal = Number(params.get('BarcodeCount')) || 0;
+    /* ── Center total label ──────────────────────────────────────────────── */
+    document.getElementById('totalLabel').textContent =
+      total > 0 ? total.toLocaleString() : '0';
 
-  const total = productVal + barcodeVal;
+    /* ── Chart ───────────────────────────────────────────────────────────── */
+    const canvas = document.getElementById('gaugeChart');
 
-  // Center total
-  document.getElementById('totalLabel').textContent = total;
-
-  const canvas = document.getElementById('gaugeChart');
-
-  new Chart(canvas, {
-    type: 'doughnut',
-    data: {
-      datasets: [{
-        data: [productVal, barcodeVal],
-        backgroundColor: ['#9b8de8', '#f5a623'],
-        borderWidth: 0,
-        hoverOffset: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-
-      rotation: -90,
-      circumference: 180,
-
-      cutout: '68%',
-
-      plugins: {
-        legend: {
-          display: false
-        },
-
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const labels = [
-                'Product Name Search',
-                'Barcode Search'
-              ];
-
-              return `${labels[ctx.dataIndex]}: ${ctx.parsed}`;
+    new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          /* Guard: if both are 0 show equal grey halves */
+          data: total > 0
+            ? [productVal, barcodeVal]
+            : [1, 1],
+          backgroundColor: total > 0
+            ? ['#a89be0', '#f5a623']
+            : ['#e0e0e0', '#eeeeee'],
+          borderWidth:  0,
+          hoverOffset:  0
+        }]
+      },
+      options: {
+        responsive:          true,
+        maintainAspectRatio: false,
+        rotation:     -90,
+        circumference: 180,
+        cutout:       '70%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const labels = ['Product Name Search', 'Barcode Search'];
+                const pct    = total > 0
+                  ? Math.round(ctx.parsed / total * 100)
+                  : 0;
+                return `${labels[ctx.dataIndex]}: ${ctx.parsed.toLocaleString()} (${pct}%)`;
+              }
             }
           }
+        },
+        animation: {
+          animateRotate: true,
+          duration:      900
         }
-      },
-
-      animation: {
-        animateRotate: true,
-        duration: 900
       }
-    }
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
