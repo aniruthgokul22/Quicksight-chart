@@ -73,64 +73,103 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  <script>
-    /* ── Read values from QuickSight URL params ──────────────────────────── */
-    const params      = new URLSearchParams(window.location.search);
-    const productVal  = Number(params.get('ProductNameCount')) || 0;
-    const barcodeVal  = Number(params.get('BarcodeCount'))     || 0;
-    const total       = productVal + barcodeVal;
+<script>
+async function loadChart() {
+    try {
 
-    console.log(params.get("ProductNameCount"));
-    console.log(params.get("BarcodeCount"));
-    
-    /* ── Center total label ──────────────────────────────────────────────── */
-    document.getElementById('totalLabel').textContent =
-      total > 0 ? total.toLocaleString() : '0';
+        // Replace with your actual API URL
+        const response = await fetch("http://localhost:53837/Barcode/GetSearchCount");
 
-    /* ── Chart ───────────────────────────────────────────────────────────── */
-    const canvas = document.getElementById('gaugeChart');
-
-    new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          /* Guard: if both are 0 show equal grey halves */
-          data: total > 0
-            ? [productVal, barcodeVal]
-            : [1, 1],
-          backgroundColor: total > 0
-            ? ['#a89be0', '#f5a623']
-            : ['#e0e0e0', '#eeeeee'],
-          borderWidth:  0,
-          hoverOffset:  0
-        }]
-      },
-      options: {
-        responsive:          true,
-        maintainAspectRatio: false,
-        rotation:     -90,
-        circumference: 180,
-        cutout:       '70%',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => {
-                const labels = ['Product Name Search', 'Barcode Search'];
-                const pct    = total > 0
-                  ? Math.round(ctx.parsed / total * 100)
-                  : 0;
-                return `${labels[ctx.dataIndex]}: ${ctx.parsed.toLocaleString()} (${pct}%)`;
-              }
-            }
-          }
-        },
-        animation: {
-          animateRotate: true,
-          duration:      900
+        if (!response.ok) {
+            throw new Error("Failed to load data");
         }
-      }
-    });
-  </script>
+
+        const data = await response.json();
+
+        console.log(data);
+
+        const productVal = Number(data.ProductNameCount) || 0;
+        const barcodeVal = Number(data.BarcodeCount) || 0;
+        const total = productVal + barcodeVal;
+        
+        document.getElementById("totalLabel").textContent =
+            total.toLocaleString();
+
+        const canvas = document.getElementById("gaugeChart");
+      
+        console.log("ProductNameCount is ",  productVal);
+        console.log("BarcodeCount is", barcodeVal );
+        console.log("Response is" , response);  
+    
+        new Chart(canvas, {
+            type: "doughnut",
+            data: {
+                datasets: [{
+                    data: total > 0
+                        ? [productVal, barcodeVal]
+                        : [1, 1],
+
+                    backgroundColor: total > 0
+                        ? ["#a89be0", "#f5a623"]
+                        : ["#e0e0e0", "#eeeeee"],
+
+                    borderWidth: 0,
+                    hoverOffset: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                rotation: -90,
+                circumference: 180,
+                cutout: "70%",
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+
+                                const labels = [
+                                    "Product Name Search",
+                                    "Barcode Search"
+                                ];
+
+                                const value = ctx.parsed;
+
+                                const percent = total > 0
+                                    ? Math.round(value / total * 100)
+                                    : 0;
+
+                                return labels[ctx.dataIndex] +
+                                    ": " +
+                                    value.toLocaleString() +
+                                    " (" +
+                                    percent +
+                                    "%)";
+                            }
+                        }
+                    }
+                },
+
+                animation: {
+                    animateRotate: true,
+                    duration: 900
+                }
+            }
+        });
+
+    }
+    catch (err) {
+        console.error(err);
+        document.getElementById("totalLabel").textContent = "0";
+    }
+}
+
+loadChart();
+</script>
 </body>
 </html>
